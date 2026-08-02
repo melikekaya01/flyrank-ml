@@ -265,45 +265,68 @@
 
 <main class="wrap">
 
-  <section id="abstract">
-    <h2>Abstract</h2>
-    <div class="abstract">
-      <p>
-        This study asks whether historical search visibility, click-through,
-        engagement, and content-update signals can be used to prioritize content
-        records for human review. Using a public-safe anonymized dataset from the
-        FlyRank ML Internship, I compared an interpretable fixed-rule baseline
-        with Logistic Regression and Random Forest on a client-grouped holdout
-        split. The methods were evaluated primarily with Precision@50 because the
-        operational objective is to place useful candidates near the top of a
-        limited review queue. The fixed-rule baseline achieved the strongest
-        Precision@50, while Random Forest achieved the highest ROC-AUC, showing
-        that broader discrimination and top-of-queue usefulness can lead to
-        different model choices. The results support using an interpretable
-        ranked queue as a human decision aid, but they do not prove that acting
-        on the recommendations will improve business performance.
-      </p>
-    </div>
-  </section>
+<section id="abstract">
+  <h2>Abstract</h2>
+
+  <p>
+    FlyRank’s practical content problem is deciding which pages should be
+    reviewed first when editors and SEO reviewers cannot inspect every
+    content record.
+  </p>
+
+  <p>
+    Using 30,000 anonymized content-level records, this project compared an
+    interpretable CTR-based rule with Logistic Regression and Random Forest.
+    Precision@50 was selected as the primary metric because the intended
+    output is a short human-review queue rather than an automated
+    content-editing system.
+  </p>
+
+  <p>
+    The fixed-rule baseline achieved a Precision@50 of 0.68, compared with
+    0.64 for Logistic Regression and 0.58 for Random Forest. Although Random
+    Forest achieved the highest ROC-AUC at 0.6111, it did not produce the
+    strongest first 50 recommendations.
+  </p>
+
+  <p>
+    The results support using the transparent fixed-rule baseline as the
+    initial content-review queue. However, the evaluation was performed
+    offline and does not prove that editing the recommended pages will
+    improve business performance.
+  </p>
+</section>
 
   <section id="problem">
-    <h2>Introduction / Problem Statement</h2>
-    <p>
-      Content teams may have thousands of pages to inspect but limited time for
-      manual review. The practical decision is therefore which records should be
-      examined first.
-    </p>
-    <p>
-      This project evaluates whether historical search and engagement signals can
-      create a useful ranked queue for editors and SEO reviewers. The system is a
-      prioritization tool and does not automatically edit, delete, or publish
-      content.
-    </p>
-    <div class="note">
-      <strong>Research question:</strong> Can public-safe historical signals rank
-      content records that are more likely to require human review?
-    </div>
-  </section>
+  <h2>Introduction</h2>
+
+  <p>
+    FlyRank content teams may have more pages to review than editors and SEO
+    specialists can inspect manually. Therefore, the main problem is deciding
+    which content records should be reviewed first.
+  </p>
+
+  <p>
+    This project treats the task as a ranking and decision-support problem.
+    The system does not automatically edit, remove, or publish content.
+    Instead, it produces a short and explainable queue for human review.
+  </p>
+
+  <p>
+    The study compares a transparent fixed-rule CTR baseline with Logistic
+    Regression and Random Forest. The goal is to determine whether a more
+    complex machine learning model improves the first 50 recommendations that
+    a reviewer would realistically inspect.
+  </p>
+
+  <h3>Research Question</h3>
+
+  <p>
+    Can historical search visibility, click-through, engagement, and
+    content-freshness signals help FlyRank identify which content records
+    should be reviewed first?
+  </p>
+</section>
 
   <section id="data">
     <h2>Data</h2>
