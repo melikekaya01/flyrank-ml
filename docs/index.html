@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FlyRank ML Internship capstone research paper by Melike Kaya.">
+  <title>Prioritizing Content for Human Review — Melike Kaya</title>
+  <style>
+    :root {
+      --bg: #f7f4fb;
+      --paper: #ffffff;
+      --text: #251c35;
+      --muted: #6f6480;
+      --purple: #6f42c1;
+      --purple-dark: #4b2a84;
+      --purple-soft: #efe7fb;
+      --line: #e5dff0;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.7;
+    }
+
+    a { color: var(--purple-dark); }
+
+    header {
+      background: var(--purple-dark);
+      color: white;
+      padding: 64px 22px;
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.8;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 12px 0 14px;
+      max-width: 760px;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 1.08;
+    }
+
+    .intro {
+      max-width: 720px;
+      color: #e8ddf9;
+      font-size: 1.08rem;
+    }
+
+    .meta {
+      margin-top: 24px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      color: #e8ddf9;
+      font-size: 0.95rem;
+    }
+
+    nav {
+      background: white;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    nav .wrap {
+      padding: 13px 22px;
+    }
+
+    nav a {
+      text-decoration: none;
+      margin-right: 18px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    main {
+      padding: 28px 22px 60px;
+    }
+
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 30px;
+      margin: 18px 0;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: var(--purple-dark);
+      font-size: 1.8rem;
+    }
+
+    h3 {
+      margin-top: 26px;
+      color: var(--purple-dark);
+    }
+
+    .abstract {
+      border-left: 4px solid var(--purple);
+      padding-left: 18px;
+    }
+
+    .note {
+      background: var(--purple-soft);
+      border: 1px solid #dcccf2;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 20px 0;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .metric {
+      background: var(--purple-soft);
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.7rem;
+      color: var(--purple-dark);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.94rem;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+    }
+
+    th:first-child, td:first-child {
+      text-align: left;
+    }
+
+    th {
+      background: #f3eef9;
+      color: var(--purple-dark);
+    }
+
+    .best {
+      font-weight: 800;
+      color: var(--purple-dark);
+    }
+
+    figure {
+      margin: 26px 0 10px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fcfaff;
+    }
+
+    figcaption {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .recommendation {
+      border-left: 4px solid var(--purple);
+      padding-left: 16px;
+      margin: 20px 0;
+    }
+
+    code {
+      background: #f1ecf7;
+      border-radius: 5px;
+      padding: 0.1em 0.35em;
+    }
+
+    footer {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 22px 50px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 700px) {
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="label">FlyRank ML Internship · Capstone Research Paper</div>
+    <h1>Prioritizing Content for Human Review Using Search and Engagement Signals</h1>
+    <p class="intro">
+      A comparison of an interpretable CTR-based baseline, Logistic Regression,
+      and Random Forest on a client-grouped holdout.
+    </p>
+    <div class="meta">
+      <span><strong>Author:</strong> Melike Kaya</span>
+      <span><strong>Primary metric:</strong> Precision@50</span>
+      <span><strong>Test records:</strong> 6,163</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#abstract">Abstract</a>
+    <a href="#problem">Problem</a>
+    <a href="#data">Data</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#results">Results</a>
+    <a href="#limitations">Limitations</a>
+    <a href="#recommendations">Recommendations</a>
+    <a href="#reproducibility">Reproducibility</a>
+    <a href="#credit">Credit</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section id="abstract">
+    <h2>Abstract</h2>
+    <div class="abstract">
+      <p>
+        This study asks whether historical search visibility, click-through,
+        engagement, and content-update signals can be used to prioritize content
+        records for human review. Using a public-safe anonymized dataset from the
+        FlyRank ML Internship, I compared an interpretable fixed-rule baseline
+        with Logistic Regression and Random Forest on a client-grouped holdout
+        split. The methods were evaluated primarily with Precision@50 because the
+        operational objective is to place useful candidates near the top of a
+        limited review queue. The fixed-rule baseline achieved the strongest
+        Precision@50, while Random Forest achieved the highest ROC-AUC, showing
+        that broader discrimination and top-of-queue usefulness can lead to
+        different model choices. The results support using an interpretable
+        ranked queue as a human decision aid, but they do not prove that acting
+        on the recommendations will improve business performance.
+      </p>
+    </div>
+  </section>
+
+  <section id="problem">
+    <h2>Introduction / Problem Statement</h2>
+    <p>
+      Content teams may have thousands of pages to inspect but limited time for
+      manual review. The practical decision is therefore which records should be
+      examined first.
+    </p>
+    <p>
+      This project evaluates whether historical search and engagement signals can
+      create a useful ranked queue for editors and SEO reviewers. The system is a
+      prioritization tool and does not automatically edit, delete, or publish
+      content.
+    </p>
+    <div class="note">
+      <strong>Research question:</strong> Can public-safe historical signals rank
+      content records that are more likely to require human review?
+    </div>
+  </section>
+
+  <section id="data">
+    <h2>Data</h2>
+    <p>
+      The project uses the public-safe, anonymized dataset provided through the
+      FlyRank ML Internship. The release was derived from approximately 79 million
+      rows of production search and analytics data.
+    </p>
+    <p>
+      Modeling and ranking used the prepared
+      <code>content_refresh_anonymized.csv</code> table containing 30,000
+      content-level records and 44 columns. Signals include impressions, clicks,
+      click-through rate, average search position, engagement measures, content
+      freshness, and recent performance information.
+    </p>
+    <p>
+      March 2026 was used as the feature window in the forward-looking data
+      contract, while April 2026 was used as the outcome window.
+    </p>
+
+    <h3>What was excluded and why</h3>
+    <p>
+      Client and content identifiers were excluded from model features because
+      they identify or group records rather than represent transferable behavior.
+      Fields directly used to construct the target, including
+      <code>trend_direction</code> and <code>trend_pct</code>, were excluded to
+      reduce leakage. No client names, page URLs, private search queries,
+      credentials, or other identifying information appear in this public page.
+    </p>
+  </section>
+
+  <section id="methodology">
+    <h2>Methodology</h2>
+
+    <h3>Label and assumptions</h3>
+    <p>
+      The target is a binary decline indicator based on future-period
+      performance. Historical visibility, engagement, freshness, and behavior
+      signals were treated as ranking inputs, not as proof that an edit would
+      cause improvement.
+    </p>
+
+    <h3>Baseline and models</h3>
+    <p>
+      The Week 4 CTR baseline ranks records using an interpretable action score
+      based on visible search demand, search position, weak click-through
+      performance, and related opportunity signals. It was compared with
+      Logistic Regression and Random Forest.
+    </p>
+
+    <h3>Validation design</h3>
+    <p>
+      The data was split by client rather than by random row. Training contained
+      23,837 records from 25 clients, while testing contained 6,163 records from
+      7 unseen clients. There was no client overlap between the two groups.
+    </p>
+
+    <h3>Evaluation</h3>
+    <p>
+      Precision@50 was selected as the primary operational metric because the
+      review process focuses on a small queue. Precision@20, Recall@50, Average
+      Precision, ROC-AUC, and the test-set base rate were also reported.
+    </p>
+  </section>
+
+  <section id="results">
+    <h2>Results</h2>
+
+    <div class="metrics">
+      <div class="metric">
+        <strong>0.68</strong>
+        <span>CTR baseline Precision@50</span>
+      </div>
+      <div class="metric">
+        <strong>0.6111</strong>
+        <span>Best ROC-AUC, Random Forest</span>
+      </div>
+      <div class="metric">
+        <strong>0.511</strong>
+        <span>Test-set base rate</span>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Precision@20</th>
+            <th>Precision@50</th>
+            <th>Recall@50</th>
+            <th>Average Precision</th>
+            <th>ROC-AUC</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Week 4 CTR baseline</td>
+            <td>0.75</td>
+            <td class="best">0.68</td>
+            <td>0.0108</td>
+            <td>0.5223</td>
+            <td>0.5202</td>
+          </tr>
+          <tr>
+            <td>Logistic Regression</td>
+            <td>0.70</td>
+            <td>0.64</td>
+            <td>0.0102</td>
+            <td>0.5691</td>
+            <td>0.5777</td>
+          </tr>
+          <tr>
+            <td>Random Forest</td>
+            <td>0.60</td>
+            <td>0.58</td>
+            <td>0.0092</td>
+            <td>0.5898</td>
+            <td class="best">0.6111</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 760 410" role="img" aria-labelledby="chartTitle chartDesc" style="width:100%;height:auto">
+        <title id="chartTitle">Precision at 50 comparison</title>
+        <desc id="chartDesc">CTR baseline scored 0.68, Logistic Regression 0.64, Random Forest 0.58, and the test base rate was 0.511.</desc>
+
+        <rect width="760" height="410" fill="#fcfaff"/>
+        <line x1="90" y1="325" x2="710" y2="325" stroke="#8d829a" stroke-width="2"/>
+        <line x1="90" y1="55" x2="90" y2="325" stroke="#8d829a" stroke-width="2"/>
+
+        <g stroke="#e9e2f2" stroke-width="1">
+          <line x1="90" y1="271" x2="710" y2="271"/>
+          <line x1="90" y1="217" x2="710" y2="217"/>
+          <line x1="90" y1="163" x2="710" y2="163"/>
+          <line x1="90" y1="109" x2="710" y2="109"/>
+          <line x1="90" y1="55" x2="710" y2="55"/>
+        </g>
+
+        <g fill="#6f6480" font-size="14">
+          <text x="55" y="330">0.0</text>
+          <text x="55" y="276">0.2</text>
+          <text x="55" y="222">0.4</text>
+          <text x="55" y="168">0.6</text>
+          <text x="55" y="114">0.8</text>
+          <text x="55" y="60">1.0</text>
+        </g>
+
+        <line x1="90" y1="187" x2="710" y2="187"
+              stroke="#8d829a" stroke-width="2" stroke-dasharray="7 7"/>
+        <text x="535" y="178" fill="#6f6480" font-size="13">Base rate 0.511</text>
+
+        <rect x="145" y="141.4" width="120" height="183.6" rx="7" fill="#5d35a4"/>
+        <rect x="335" y="152.2" width="120" height="172.8" rx="7" fill="#7b52bd"/>
+        <rect x="525" y="168.4" width="120" height="156.6" rx="7" fill="#9d7bcf"/>
+
+        <g fill="#251c35" font-size="18" font-weight="700" text-anchor="middle">
+          <text x="205" y="130">0.68</text>
+          <text x="395" y="141">0.64</text>
+          <text x="585" y="157">0.58</text>
+        </g>
+
+        <g fill="#5f546e" font-size="13" text-anchor="middle">
+          <text x="205" y="349">CTR baseline</text>
+          <text x="395" y="349">Logistic</text>
+          <text x="395" y="366">Regression</text>
+          <text x="585" y="349">Random</text>
+          <text x="585" y="366">Forest</text>
+        </g>
+      </svg>
+
+      <figcaption>
+        The CTR baseline placed the highest proportion of positive cases in the
+        first 50 recommendations. Random Forest achieved the strongest ROC-AUC,
+        but not the strongest top-of-queue result.
+      </figcaption>
+    </figure>
+
+    <p>
+      The baseline Precision@50 of 0.68 means that 34 of the first 50
+      recommendations were positive cases on the held-out test set. Logistic
+      Regression achieved 0.64 and Random Forest achieved 0.58.
+    </p>
+
+    <div class="note">
+      <strong>Decision:</strong> retain the interpretable CTR baseline as the
+      initial queue generator for this dataset, split, label definition, and
+      review capacity.
+    </div>
+  </section>
+
+  <section id="limitations">
+    <h2>Limitations &amp; Honest Framing</h2>
+    <p>
+      This study is an offline evaluation. It does not measure what happens after
+      reviewers act and does not prove that editing a recommended page will
+      improve traffic, engagement, or business outcomes.
+    </p>
+    <p>
+      The label is a proxy for future decline, not a direct measure of whether a
+      page should be refreshed. Seasonality, competition, search demand, SERP
+      changes, technical problems, and other unobserved factors may affect the
+      outcome.
+    </p>
+    <p>
+      Baseline thresholds and weights were manually designed, the machine
+      learning models were not exhaustively tuned, and the conclusions come from
+      one prepared dataset and one grouped holdout split.
+    </p>
+  </section>
+
+  <section id="recommendations">
+    <h2>Ranked Recommendations</h2>
+
+    <div class="recommendation">
+      <h3>1. Review title and meta information</h3>
+      <p>
+        Prioritize pages with meaningful visibility but weak click-through.
+        Compare titles and descriptions with likely search intent and the promise
+        made by the page.
+      </p>
+    </div>
+
+    <div class="recommendation">
+      <h3>2. Refresh visible but aging content</h3>
+      <p>
+        Check whether dates, facts, examples, screenshots, and key sections remain
+        current. Update only after manual inspection.
+      </p>
+    </div>
+
+    <div class="recommendation">
+      <h3>3. Investigate engagement weakness</h3>
+      <p>
+        Review content-message alignment, readability, internal links, calls to
+        action, page speed, and layout issues.
+      </p>
+    </div>
+
+    <div class="recommendation">
+      <h3>4. Reassess low-confidence candidates</h3>
+      <p>
+        Keep low-volume and borderline records lower in the queue, gather more
+        observations, and consider seasonality before acting.
+      </p>
+    </div>
+
+    <div class="note">
+      Review the top 50 records manually, document the action taken, and collect
+      post-review outcomes for future threshold recalibration and model
+      improvement.
+    </div>
+  </section>
+
+  <section id="reproducibility">
+    <h2>Reproducibility</h2>
+    <p>
+      The complete workflow, validation design, exclusions, results, and ranked
+      recommendations are available in the public repository.
+    </p>
+    <ul>
+      <li><a href="https://github.com/melikekaya01/flyrank-ml">Project repository</a></li>
+      <li><a href="https://github.com/melikekaya01/flyrank-ml/blob/main/work/notebooks/w03_data_contract.ipynb">Data contract notebook</a></li>
+      <li><a href="https://github.com/melikekaya01/flyrank-ml/blob/main/work/notebooks/w04_baseline_score.ipynb">CTR baseline notebook</a></li>
+      <li><a href="https://github.com/melikekaya01/flyrank-ml/blob/main/work/notebooks/w05_model.ipynb">Model comparison notebook</a></li>
+      <li><a href="https://github.com/melikekaya01/flyrank-ml/blob/main/work/notebooks/w06_validation_audit.ipynb">Validation audit notebook</a></li>
+      <li><a href="https://github.com/melikekaya01/flyrank-ml/blob/main/work/notebooks/w07_action_playbook.ipynb">Action playbook notebook</a></li>
+      <li><a href="https://github.com/melikekaya01/flyrank-ml/blob/main/work/notebooks/capstone.ipynb">Capstone notebook</a></li>
+    </ul>
+    <p>Random seed: <code>42</code>.</p>
+  </section>
+
+  <section id="credit">
+    <h2>Acknowledgments &amp; Data Credit</h2>
+    <p>
+      Built on the
+      <a href="https://flyrank.ai">FlyRank ML Internship dataset</a>.
+    </p>
+    <p>
+      The dataset and project structure were supplied for educational research
+      and portfolio development. Published outputs use anonymized, public-safe
+      information.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <p>Research artifact by Melike Kaya · FlyRank ML Internship capstone.</p>
+</footer>
+
+</body>
+</html>
